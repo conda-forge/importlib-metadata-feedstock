@@ -1,17 +1,21 @@
 {% set name = "importlib-metadata" %}
-{% set version = "0.19" %}
+{% set version = "2.0.0" %}
+
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  url: https://files.pythonhosted.org/packages/27/49/58d50a592d99a6bf58c4c1b02b203a48357a74e33922a9d021fda07d4ce3/importlib_metadata-{{ version }}.tar.gz
-  sha256: 23d3d873e008a513952355379d93cbcab874c58f4f034ff657c7a87422fa64e8
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 77a540690e24b0305878c37ffd421785a6f7e53c8b5720d211b211de8d0e95da
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+  skip: true   # [py<=34]
+  script: 
+    - {{ PYTHON }} -m pip install . -vv       # [py>34]
+    - echo "dummy package for python >= 3.8"  # [py>=38]
 
 requirements:
   host:
@@ -19,25 +23,27 @@ requirements:
     - python
     - setuptools_scm
   run:
-    - python
-    - zipp
-    - configparser
+    - configparser >=3.5
     - contextlib2
     - pathlib2
+    - python
+    - zipp >=0.5
 
 test:
   imports:
     - importlib_metadata
+    - importlib_metadata.docs
+  commands:
+    - pip check
+  requires:
+    - pip
 
 about:
-  home: https://gitlab.com/python-devs/importlib_metadata
-  license: Apache Software
-  license_family: APACHE
+  home: http://importlib-metadata.readthedocs.io/
+  summary: Read metadata from Python packages
+  license: Apache-2.0
   license_file: LICENSE
-  summary: Summary of the package
-  doc_url: https://importlib_metadata.readthedocs.io
-  dev_url: https://gitlab.com/python-devs/importlib_metadata
 
 extra:
   recipe-maintainers:
-    - bgruening
+    - marcelotrevisani
